@@ -2,11 +2,7 @@
 
 Automatically sends a message to Claude Pro every morning at 8:00 AM to start the 5-hour usage timer. So that we can fit 3 5-hr claude session on a normal workday.
 
-## Setup Completed
-
-The automation has been successfully installed and tested. Here's what was set up:
-
-### Files Created
+### Files
 
 1. **~/bin/start-claude-timer.sh** - Main execution script
 2. **~/Library/LaunchAgents/com.user.claude.timer.plist** - launchd scheduler configuration

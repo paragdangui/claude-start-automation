@@ -2,19 +2,29 @@
 
 Automatically sends a message to Claude Pro every morning at 8:00 AM to start the 5-hour usage timer. So that we can fit 3 5-hr claude session on a normal workday.
 
-## Setup Completed
+## Local Configuration
 
-The automation has been successfully installed and tested. Here's what was set up:
+This checkout is configured for the local account `parag` and the native Claude
+Code installation at `~/.local/bin/claude`.
 
-### Files Created
+### Project Files
 
-1. **~/bin/start-claude-timer.sh** - Main execution script
-2. **~/Library/LaunchAgents/com.user.claude.timer.plist** - launchd scheduler configuration
-3. **~/bin/logs/** - Log directory for automation output
+1. **start-claude-timer.sh** - Source for the installed execution script
+2. **com.user.claude.timer.plist** - Source for the launchd configuration
+3. **logs/** - Development log directory; installed runs log to `~/bin/logs/`
+
+### Install
+
+```bash
+mkdir -p ~/bin/logs ~/Library/LaunchAgents
+cp start-claude-timer.sh ~/bin/start-claude-timer.sh
+cp com.user.claude.timer.plist ~/Library/LaunchAgents/com.user.claude.timer.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.user.claude.timer.plist
+```
 
 ### How It Works
 
-- Every day at 8:00 AM, macOS launchd triggers the script
+- Every weekday at 8:00 AM, macOS launchd triggers the script
 - The script sends "Good morning" to Claude Code CLI
 - This starts your 5-hour usage timer
 - Logs are saved to `~/bin/logs/stdout.log`
@@ -43,7 +53,7 @@ tail -20 ~/bin/logs/stderr.log
 To test immediately without waiting for 8:00 AM:
 
 ```bash
-launchctl start com.user.claude.timer
+launchctl kickstart gui/$(id -u)/com.user.claude.timer
 ```
 
 Then check the logs:
@@ -55,7 +65,7 @@ cat ~/bin/logs/stdout.log
 ## Verify Next Scheduled Run
 
 ```bash
-launchctl print user/$(id -u)/com.user.claude.timer
+launchctl print gui/$(id -u)/com.user.claude.timer
 ```
 
 ## Logs Location
@@ -70,12 +80,11 @@ To remove the automation:
 
 ```bash
 # Unload the job
-launchctl unload ~/Library/LaunchAgents/com.user.claude.timer.plist
+launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.user.claude.timer.plist
 
 # Remove the files
 rm ~/Library/LaunchAgents/com.user.claude.timer.plist
 rm ~/bin/start-claude-timer.sh
-rm -rf ~/bin/logs
 ```
 
 ## Troubleshooting
@@ -96,15 +105,3 @@ launchctl list | grep claude.timer
   ```bash
   claude setup-token
   ```
-
-## Test Results
-
-Latest test (2025-12-23 12:13:55):
-
-```
-[2025-12-23 12:13:55] Starting Claude timer...
-Good morning! How can I help you today?
-[2025-12-23 12:13:59] Claude timer started successfully
-```
-
-Status: ✅ Working perfectly

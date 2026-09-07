@@ -9,7 +9,7 @@
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>/Users/paragsmartshore/bin/start-claude-timer.sh</string>
+        <string>/Users/parag/bin/start-claude-timer.sh</string>
     </array>
 
     <key>StartCalendarInterval</key>
@@ -62,15 +62,15 @@
     </array>
 
     <key>StandardOutPath</key>
-    <string>/Users/paragsmartshore/bin/logs/launchd-stdout.log</string>
+    <string>/Users/parag/bin/logs/launchd-stdout.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/paragsmartshore/bin/logs/launchd-stderr.log</string>
+    <string>/Users/parag/bin/logs/launchd-stderr.log</string>
 
     <key>RunAtLoad</key>
     <false/>
 
     <key>WorkingDirectory</key>
-    <string>/Users/paragsmartshore/bin</string>
+    <string>/Users/parag/bin</string>
 </dict>
 </plist>

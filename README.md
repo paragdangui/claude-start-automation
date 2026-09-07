@@ -1,107 +1,97 @@
-# Claude Pro Timer Automation
+# Claude and Codex Morning Automation
 
-Automatically sends a message to Claude Pro every morning at 8:00 AM to start the 5-hour usage timer. So that we can fit 3 5-hr claude session on a normal workday.
+Sends a short greeting through each CLI every Monday–Friday using macOS launchd:
 
-## Local Configuration
+- Claude: **8:00 AM**
+- Codex: **7:30 AM**
 
-This checkout is configured for the local account `parag` and the native Claude
-Code installation at `~/.local/bin/claude`.
+Times use the Mac's local timezone. These greetings are intended to start morning
+usage; successful execution does not verify a usage-window reset.
 
-### Project Files
+## Configuration and installation
 
-1. **start-claude-timer.sh** - Source for the installed execution script
-2. **com.user.claude.timer.plist** - Source for the launchd configuration
-3. **logs/** - Development log directory; installed runs log to `~/bin/logs/`
-
-### Install
+Edit `schedule.env` to change the independent schedules:
 
 ```bash
-mkdir -p ~/bin/logs ~/Library/LaunchAgents
-cp start-claude-timer.sh ~/bin/start-claude-timer.sh
-cp com.user.claude.timer.plist ~/Library/LaunchAgents/com.user.claude.timer.plist
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.user.claude.timer.plist
+CLAUDE_RUN_TIME=08:00
+CODEX_RUN_TIME=07:30
 ```
 
-### How It Works
-
-- Every weekday at 8:00 AM, macOS launchd triggers the script
-- The script sends "Good morning" to Claude Code CLI
-- This starts your 5-hour usage timer
-- Logs are saved to `~/bin/logs/stdout.log`
-
-### No Need to Keep Anything Running
-
-You don't need to keep Claude Code, this project, or any terminal window open. The automation runs completely in the background via macOS launchd. Just have your computer powered on at 8:00 AM (or it will run when you wake it up).
-
-## Status Check
-
-To verify the automation is running:
+Use 24-hour `HH:MM` format, then apply both schedules:
 
 ```bash
-# Check if job is loaded
-launchctl list | grep claude.timer
-
-# View recent logs
-tail -20 ~/bin/logs/stdout.log
-
-# View errors (if any)
-tail -20 ~/bin/logs/stderr.log
+bash install.sh --preview
+bash install.sh
 ```
 
-## Manual Trigger
+The installer validates both times and generates and lints both plists before
+installing either job. Preview prints both configurations without installing them.
+The plist files are templates; do not copy them directly into LaunchAgents.
+Installation reloads both jobs but does not immediately send greetings.
 
-To test immediately without waiting for 8:00 AM:
+This checkout is configured for the local account `parag`, Claude at
+`~/.local/bin/claude`, and Codex at
+`/Applications/ChatGPT.app/Contents/Resources/codex`. Codex uses the existing
+ChatGPT CLI login. Check it with `codex login status`; use `codex login` if needed.
+For Claude authentication issues, use `claude setup-token`.
 
-```bash
-launchctl kickstart gui/$(id -u)/com.user.claude.timer
-```
+## Project files
 
-Then check the logs:
+- `start-claude-timer.sh` and `start-codex-timer.sh`: greeting scripts.
+- `com.user.claude.timer.plist` and `com.user.codex.timer.plist`: weekday templates.
+- `schedule.env`: independent start times.
+- `install.sh`: preview, install, and reload both schedules.
 
-```bash
-cat ~/bin/logs/stdout.log
-```
+Installed scripts live in `~/bin/`, with jobs in `~/Library/LaunchAgents/`.
+Claude keeps its existing invocation. Codex runs non-interactively with an
+ephemeral session, a read-only sandbox, and a prompt requesting a brief greeting
+without tools or file inspection. Both scripts record success or failure;
+Codex also records its exit status.
 
-## Verify Next Scheduled Run
+No terminal or application window needs to stay open. The Mac must be powered
+on and the user session available. A scheduled job missed during sleep can run
+when the Mac wakes; this does not wake a powered-off Mac.
+
+## Status and manual runs
+
+Inspect the loaded jobs and schedules:
 
 ```bash
 launchctl print gui/$(id -u)/com.user.claude.timer
+launchctl print gui/$(id -u)/com.user.codex.timer
 ```
 
-## Logs Location
+Optionally send a greeting immediately (this uses the respective service):
 
-- **~/bin/logs/stdout.log** - Script execution and Claude responses
-- **~/bin/logs/stderr.log** - Error messages (if any)
-- **~/bin/logs/launchd-stderr.log** - launchd errors (if any)
+```bash
+launchctl kickstart gui/$(id -u)/com.user.claude.timer
+launchctl kickstart gui/$(id -u)/com.user.codex.timer
+```
+
+## Logs
+
+Installed runs write to `~/bin/logs/`; running a source script directly writes
+to this checkout's `logs/` directory.
+
+| Job | Greeting output | Greeting errors | launchd output / errors |
+| --- | --- | --- | --- |
+| Claude | `stdout.log` | `stderr.log` | `launchd-stdout.log` / `launchd-stderr.log` |
+| Codex | `codex-stdout.log` | `codex-stderr.log` | `codex-launchd-stdout.log` / `codex-launchd-stderr.log` |
+
+```bash
+tail -20 ~/bin/logs/stdout.log ~/bin/logs/stderr.log
+tail -20 ~/bin/logs/codex-stdout.log ~/bin/logs/codex-stderr.log
+```
 
 ## Uninstall
 
-To remove the automation:
+Remove either job independently by setting `provider` to `claude` or `codex`:
 
 ```bash
-# Unload the job
-launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.user.claude.timer.plist
-
-# Remove the files
-rm ~/Library/LaunchAgents/com.user.claude.timer.plist
-rm ~/bin/start-claude-timer.sh
+provider=codex
+launchctl bootout gui/$(id -u)/com.user.$provider.timer
+rm ~/Library/LaunchAgents/com.user.$provider.timer.plist
+rm ~/bin/start-$provider-timer.sh
 ```
 
-## Troubleshooting
-
-**Job not running:**
-
-```bash
-launchctl list | grep claude.timer
-```
-
-**Computer asleep at 8 AM:**
-
-- launchd will execute the job when your computer wakes up
-
-**Authentication issues:**
-
-- If Claude CLI token expires, re-authenticate:
-  ```bash
-  claude setup-token
-  ```
+Logs are retained.

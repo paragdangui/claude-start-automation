@@ -4,12 +4,12 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.user.claude.timer</string>
+    <string>com.user.codex.timer</string>
 
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>/Users/parag/bin/start-claude-timer.sh</string>
+        <string>/Users/parag/bin/start-codex-timer.sh</string>
     </array>
 
     <key>StartCalendarInterval</key>
@@ -62,10 +62,10 @@
     </array>
 
     <key>StandardOutPath</key>
-    <string>/Users/parag/bin/logs/launchd-stdout.log</string>
+    <string>/Users/parag/bin/logs/codex-launchd-stdout.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/parag/bin/logs/launchd-stderr.log</string>
+    <string>/Users/parag/bin/logs/codex-launchd-stderr.log</string>
 
     <key>RunAtLoad</key>
     <false/>

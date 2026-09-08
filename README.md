@@ -2,8 +2,8 @@
 
 Sends a short greeting through each CLI every Monday–Friday using macOS launchd:
 
-- Claude: **8:00 AM**
-- Codex: **7:30 AM**
+- Claude: **8:30 AM**
+- Codex: **8:00 AM**
 
 Times use the Mac's local timezone. These greetings are intended to start morning
 usage; successful execution does not verify a usage-window reset.
@@ -13,8 +13,8 @@ usage; successful execution does not verify a usage-window reset.
 Edit `schedule.env` to change the independent schedules:
 
 ```bash
-CLAUDE_RUN_TIME=08:00
-CODEX_RUN_TIME=07:30
+CLAUDE_RUN_TIME=08:30
+CODEX_RUN_TIME=08:00
 ```
 
 Use 24-hour `HH:MM` format, then apply both schedules:

@@ -1,4 +1,4 @@
-# Claude and Codex Morning Automation
+# Auto Session Start
 
 Sends a short greeting through each CLI every Monday–Friday using macOS launchd:
 
@@ -95,3 +95,86 @@ rm ~/bin/start-$provider-timer.sh
 ```
 
 Logs are retained.
+
+## Native macOS app
+
+The SwiftUI app in `macos/` provides independent weekday schedules, an explicit
+Apply button, Run now, persistent run status, logs, and executable path Settings.
+Opening the app does not install jobs or send greetings. Run now sends a request
+through the selected service, even when its schedule is disabled.
+
+A local Release copy is installed at `~/Applications/Auto Session Start.app`.
+Open it in Finder or drag it to the Dock. It uses a regular application window,
+not a menu bar icon. Closing the window or using Command-Q leaves enabled
+LaunchAgents running. Clicking the app again reopens its main window.
+
+### Build and install
+
+Requires macOS 13 or newer and a compatible Swift/macOS SDK. Open
+`macos/GreetingScheduler.xcodeproj` in full Xcode and build the AutoSessionStart
+target, or use the tested Command Line Tools build:
+
+```bash
+./macos/build.sh
+mkdir -p "$HOME/Applications"
+ditto "macos/build/Auto Session Start.app" "$HOME/Applications/Auto Session Start.app"
+open "$HOME/Applications/Auto Session Start.app"
+```
+
+Quit the app before replacing an existing copy. The build is ad-hoc signed for
+local personal use and has no App Sandbox. No paid Apple Developer membership,
+server, hosting, or App Store submission is needed. Provider subscriptions/API
+usage and internet access still apply; this app does not store credentials or
+perform login flows. CLI output is retained locally in logs.
+
+### Setup, settings, and migration
+
+On a fresh installation, review executable paths in Settings, then choose
+**Install schedules**. Existing installed weekday times take precedence over
+repository defaults. Unsupported schedules require an explicit **Replace existing
+schedule** selection. Each provider reports its own update errors; one missing
+CLI does not prevent configuring the other provider. Disabling remains possible
+if an executable has been removed.
+
+Time, enabled state, and executable path edits are drafts until **Apply schedule**
+is pressed for that provider. The installed schedule is shown separately.
+Run now uses the currently selected executable path. Successful greetings do not
+verify any quota or usage-window reset. Failures show an exit code and View logs;
+repair login externally when needed.
+
+The app reuses `com.user.claude.timer` and `com.user.codex.timer`, backs up old
+plists, and installs standalone runners. It does not trigger a greeting when
+loading a schedule. After migration, manage schedules in the app; do not run the
+old `install.sh`, which would replace the app’s configuration. The legacy CLI
+workflow remains available for users who have not migrated.
+
+App files live in `~/Library/Application Support/GreetingScheduler/`:
+
+- `settings.json`: versioned settings, saved atomically.
+- `runners/`: installed scripts independent of the app/source checkout.
+- `logs/`: provider output and launchd logs.
+- `status/`: atomic JSON run records and kernel lock files.
+- `backups/`: previous LaunchAgent plists.
+
+Legacy scripts in `~/bin/` and historical logs in `~/bin/logs/` are preserved.
+The app needs no repository checkout at runtime and derives paths from the
+current user’s home. Enabled schedules require a powered-on Mac and available
+user session; the app does not wake the Mac or promise exact execution during sleep.
+
+### Remove the app
+
+Disable both schedules and press Apply for each **before** deleting the app.
+Moving or deleting the app alone does not remove its jobs. You may then delete
+`~/Applications/Auto Session Start.app`. Settings and logs remain in Application
+Support until you choose to remove them. The earlier launchctl uninstall commands
+also remove the jobs if the app is unavailable.
+
+### Verification
+
+Run `./macos/test.sh` for isolated stub and core tests. The optional
+`python3 macos/tests/test_launchd.py` loads a temporary uniquely named launchd job
+and waits up to 90 seconds for a local stub run, then cleans up.
+See [macos/VERIFICATION.md](macos/VERIFICATION.md) for results and remaining manual
+checks. No real service requests are required by these tests.
+
+The app uses a clock-and-play icon for scheduled session starts. Its bundle identifier and Application Support folder retain `GreetingScheduler` for compatibility with existing settings and jobs. To regenerate the icon, run `bash macos/tools/generate-icon.sh`.

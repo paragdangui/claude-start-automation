@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Use an absolute path because launchd has a minimal environment.
-CODEX_BIN="/Applications/ChatGPT.app/Contents/Resources/codex"
+CODEX_BIN="/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_DIR="$SCRIPT_DIR/logs"
 mkdir -p "$LOG_DIR"

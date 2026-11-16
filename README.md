@@ -31,7 +31,7 @@ Installation reloads both jobs but does not immediately send greetings.
 
 This checkout is configured for the local account `parag`, Claude at
 `~/.local/bin/claude`, and Codex at
-`/Applications/ChatGPT.app/Contents/Resources/codex`. Codex uses the existing
+`/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex`. Codex uses the existing
 ChatGPT CLI login. Check it with `codex login status`; use `codex login` if needed.
 For Claude authentication issues, use `claude setup-token`.
 

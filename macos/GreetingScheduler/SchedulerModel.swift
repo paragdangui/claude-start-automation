@@ -56,6 +56,7 @@ struct RunRecord: Decodable {
                 if !initialized {
                     drafts[key] = snapshot.1[key]?.exists == true ? actual : snapshot.0.providers[key]!
                     if FileManager.default.fileExists(atPath: manager.store.file.path) { drafts[key] = actual }
+                    drafts[key] = drafts[key]?.migrated()
                 }
                 applied[key] = actual
             }

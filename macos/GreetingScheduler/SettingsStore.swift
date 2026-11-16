@@ -19,10 +19,10 @@ struct Configuration: Codable, Equatable {
         else { throw SchedulerError.message("Select an executable file at an absolute path: \(executable)") }
     }
     static let codexPath = "/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex"
-    static let legacyCodexPaths = ["/Applications/ChatGPT.app/Contents/Resources/codex"]
-    /// Points a stale ChatGPT-bundled Codex path at the CLI's current location inside the app.
+    /// Points a stale ChatGPT-bundled Codex path (moved by a ChatGPT update) at the CLI's current location inside the app.
     func migrated() -> Configuration {
-        guard Self.legacyCodexPaths.contains(executable), !FileManager.default.isExecutableFile(atPath: executable),
+        guard executable.hasPrefix("/Applications/ChatGPT.app/"), executable != Self.codexPath,
+              !FileManager.default.isExecutableFile(atPath: executable),
               FileManager.default.isExecutableFile(atPath: Self.codexPath) else { return self }
         var copy = self; copy.executable = Self.codexPath; return copy
     }

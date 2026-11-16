@@ -60,7 +60,19 @@ struct RunRecord: Decodable {
                 }
                 applied[key] = actual
             }
+            let firstLoad = !initialized
             initialized = true; setupError = nil
+            // Re-install jobs whose executable path went stale (e.g. ChatGPT moved its bundled Codex CLI).
+            if firstLoad {
+                refreshing = false  // let update() refresh afterwards
+                for provider in Provider.allCases {
+                    let key = provider.rawValue
+                    guard let actual = applied[key], actual.enabled, inspections[key]?.managed == true,
+                          inspections[key]?.unsupported != true, actual.migrated() != actual,
+                          drafts[key] == actual.migrated() else { continue }
+                    await update(provider)
+                }
+            }
         } catch { setupError = error.localizedDescription }
     }
     func update(_ provider: Provider) async {

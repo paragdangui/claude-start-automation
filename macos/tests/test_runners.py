@@ -14,7 +14,7 @@ class RunnerTests(unittest.TestCase):
     def test_success_and_flags(self):
         self.assertEqual(self.run_cli(), 0)
         self.assertEqual(self.record()['exitCode'], 0)
-        self.assertEqual(pathlib.Path(str(self.cli)+'.args').read_text().splitlines(), ['--print','Good morning','--no-session-persistence','--tools','','--max-budget-usd','0.05'])
+        self.assertEqual(pathlib.Path(str(self.cli)+'.args').read_text().splitlines(), ['--print','Good morning','--no-session-persistence','--tools','','--max-budget-usd','0.10'])
         self.assertIn('stub-output', (self.root/'logs/claude.log').read_text())
     def test_codex_failure(self):
         self.assertEqual(self.run_cli('codex', STUB_EXIT='9'), 9)

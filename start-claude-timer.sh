@@ -15,7 +15,7 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting Claude timer..." >> "$LOG_DIR/stdo
 if "$CLAUDE_BIN" --print "Good morning" \
   --no-session-persistence \
   --tools "" \
-  --max-budget-usd 0.05 >> "$LOG_DIR/stdout.log" 2>> "$LOG_DIR/stderr.log"; then
+  --max-budget-usd 0.10 >> "$LOG_DIR/stdout.log" 2>> "$LOG_DIR/stderr.log"; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] Claude timer started successfully" >> "$LOG_DIR/stdout.log"
 else
   status=$?

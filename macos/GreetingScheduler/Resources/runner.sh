@@ -37,7 +37,7 @@ exec >> "$root/logs/$provider.log" 2>&1
 echo "[$(date)] Starting $provider greeting"
 if [ ! -x "$executable" ]; then echo "Executable unavailable: $executable"; exit 127; fi
 case "$provider" in
-claude) "$executable" --print "Good morning" --no-session-persistence --tools "" --max-budget-usd 0.05 & ;;
+claude) "$executable" --print "Good morning" --no-session-persistence --tools "" --max-budget-usd 0.10 & ;;
 codex) "$executable" exec --ephemeral --skip-git-repo-check --sandbox read-only "Good morning. Reply briefly with a greeting only. Do not use tools or inspect files." & ;;
 *) exit 64 ;;
 esac
